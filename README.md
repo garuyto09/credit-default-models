@@ -75,6 +75,28 @@ PSI sits near zero for every model, which is exactly what a random split should
 produce. It is here as a calibrated sense of what "stable" looks like, so the same
 check means something when it is run against a later origination cohort instead.
 
+### Reading the figures
+
+**Risk bands.** The Random Forest separation is steep and usable: the riskiest decile
+defaults at roughly 70% against a 22.1% portfolio average — about 3x lift — while the
+safest decile sits near 4%. That is a top-to-bottom spread of roughly sixteen to one,
+which is what makes a tiered cut-off policy possible at all. The ordering is monotonic
+except for bands 4 and 5, which are effectively tied; a single inversion in the middle
+of the book is normal at this sample size and is not by itself a reason to reject the
+banding.
+
+**Calibration is where the models separate differently.** Random Forest and the Decision
+Tree track the diagonal closely across the whole range. KNN is the weakest by a distance:
+it never resolves below about 10% observed default even at its lowest scores, so it
+cannot identify a genuinely safe segment, and it pulls back in at the top. Logistic
+Regression is the surprise — it wanders non-monotonically through the 0.10–0.20 predicted
+band, which is exactly where the bulk of the portfolio lives. It ranks acceptably there
+but its probabilities cannot be trusted as levels.
+
+That distinction has teeth. For a pure cut-off policy the wobble is tolerable, since only
+the ordering matters. For pricing or expected-loss provisioning, where the predicted
+probability is multiplied by exposure, it is disqualifying in the densest part of the book.
+
 Full outputs land in [`reports/`](reports/):
 
 - `results.md` — the table above plus the risk band breakdown
