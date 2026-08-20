@@ -76,8 +76,10 @@ The dataset downloads itself from the UCI archive on first run and is cached in
 
 ## Origin
 
-This started as an undergraduate research project and was rebuilt to evaluate the
-models against the criteria that credit risk work actually runs on.
+Undergraduate research at UNICAMP (2024) — *Traditional vs. Machine-Learning Models
+for Credit Scoring* — recognized among the **100 best undergraduate projects** at the
+university. Rebuilt here to evaluate the same models against the criteria that credit
+risk work actually runs on, rather than the ones a classification tutorial reaches for.
 
 ## Reference
 
