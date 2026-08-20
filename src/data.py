@@ -42,17 +42,31 @@ def download(force: bool = False) -> Path:
     return RAW_PATH
 
 
-def load() -> tuple[pd.DataFrame, pd.Series]:
-    """Return the feature matrix and the binary default target.
+def _find_header_row(path: Path, max_scan: int = 5) -> int:
+    """Locate the row holding the real column names.
 
-    The published file carries two header rows — a generic X1..X23 line above the
-    real column names — so the second row is the one to read as the header.
+    The published workbook carries a generic X1..X23 line alongside the actual
+    names, and which one lands on top has varied between copies of the file
+    circulating online. Rather than hard-coding an offset that silently produces
+    columns called X1..X23, find the row that names a column we know must exist.
     """
+    probe = pd.read_excel(path, header=None, nrows=max_scan)
+    for i in range(len(probe)):
+        if probe.iloc[i].astype(str).str.strip().eq("LIMIT_BAL").any():
+            return i
+    raise ValueError(
+        f"No header row containing LIMIT_BAL in the first {max_scan} rows of {path}"
+    )
+
+
+def load() -> tuple[pd.DataFrame, pd.Series]:
+    """Return the feature matrix and the binary default target."""
     path = download()
-    df = pd.read_excel(path, header=1)
+    df = pd.read_excel(path, header=_find_header_row(path))
+    df.columns = [str(c).strip() for c in df.columns]
 
     df = df.rename(columns={"default payment next month": TARGET})
-    df = df.drop(columns=["ID"])
+    df = df.drop(columns=["ID"], errors="ignore")
 
     y = df[TARGET]
     X = df.drop(columns=[TARGET])
